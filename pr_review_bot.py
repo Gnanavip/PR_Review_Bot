@@ -1,16 +1,20 @@
 import os
 import sys
 from github import Github
+from dotenv import load_dotenv
 import openrouter
 
+# Load local .env if present (for local development)
+load_dotenv()
+
 def load_tokens():
-    gh = os.getenv("GITHUB_TOKEN")
+    gh_token = os.getenv("GITHUB_TOKEN")
     or_key = os.getenv("OPENROUTER_API_KEY")
-    if not gh:
-        raise RuntimeError("GITHUB_TOKEN missing. Set it in environment variables.")
+    if not gh_token:
+        raise RuntimeError("GITHUB_TOKEN missing. Set it in environment variables or .env file.")
     if not or_key:
-        raise RuntimeError("OPENROUTER_API_KEY missing. Set it in environment variables.")
-    return gh, or_key
+        raise RuntimeError("OPENROUTER_API_KEY missing. Set it in environment variables or .env file.")
+    return gh_token, or_key
 
 def get_ai_suggestion(file_content, file_name, or_key):
     client = openrouter.OpenRouter(api_key=or_key)
@@ -48,7 +52,8 @@ def main():
     for file in changed_files:
         try:
             content = repo.get_contents(file, ref=pr.head.ref).decoded_content.decode()
-        except:
+        except Exception as e:
+            print(f"Could not fetch content for {file}: {e}")
             content = ""
         suggestion = get_ai_suggestion(content, file, or_key)
         pr.create_issue_comment(f"**AI Suggestion for {file}:**\n{suggestion}")
@@ -58,4 +63,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
