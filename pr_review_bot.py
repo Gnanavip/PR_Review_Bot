@@ -1,7 +1,7 @@
 import os
 import sys
 from github import Github
-from openrouter import OpenRouter
+import openrouter
 
 def load_tokens():
     gh = os.getenv("GITHUB_TOKEN")
@@ -13,7 +13,7 @@ def load_tokens():
     return gh, or_key
 
 def get_ai_suggestion(file_content, file_name, or_key):
-    client = OpenRouter(api_key=or_key)
+    client = openrouter.OpenRouter(api_key=or_key)
     prompt = f"Analyze this code file named {file_name} and provide suggestions for coding style, best practices, and improvements:\n\n{file_content}"
     response = client.completions.create(
         model="gpt-4o-mini",
@@ -58,3 +58,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
