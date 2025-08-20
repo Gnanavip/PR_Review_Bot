@@ -1,3 +1,6 @@
-requests
 PyGithub
-openrouter
+requests
+python-dotenv
+fastapi
+uvicorn
+openai
